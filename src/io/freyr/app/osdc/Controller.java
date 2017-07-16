@@ -182,8 +182,7 @@ public final class Controller implements Initializable {
 							
 						}
 						
-						dos.write(0);
-						
+						dos.write(0);						
 						
 					}
 					
