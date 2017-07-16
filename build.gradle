@@ -1,0 +1,19 @@
+group = 'osdc'
+version = '1.0.0'
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    testCompile group: 'junit', name: 'junit', version: '4.11' 
+
+    compile "org.projectlombok:lombok:1.16.2"
+
+}
+
+sourceSets { 
+   	main.java.srcDirs = ['src/main/java']
+}

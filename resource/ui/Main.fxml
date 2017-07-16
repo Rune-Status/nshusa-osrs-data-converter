@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.battlerune.app.osdc.Controller">
+   <center>
+      <VBox>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+         <children>
+            <TitledPane text="Configs">
+               <content>
+                  <VBox alignment="CENTER" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed">
+                     <children>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpItemDefs" text="Item Definitions (obj)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpNpcDefs" text="Npc Definitions (npc)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpObjectDefs" text="Object Definitions (loc)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpAnimationDefs" text="Animation Definitions (seq)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpGraphicDefs" text="Graphic Definitions (spotanim)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpVarbitDefs" text="Varbit Definitions (varbit)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpFloorDefs" text="Floor Definitions (flo)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+            <TitledPane text="Indices">
+               <content>
+                  <VBox alignment="CENTER" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed">
+                     <children>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpModels" text="Models (Index 1)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpAnimations" text="Animations (Index 2)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpMidis" text="Midis (Index 3)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpMaps" text="Maps (Index 4)">
+                           <VBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+            <TitledPane text="Other">
+               <content>
+                  <VBox alignment="CENTER" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed">
+                     <children>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpSprites" text="Sprites">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </VBox.margin></Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpMapImage" text="Map Image">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+         </children>
+      </VBox>
+   </center>
+   <bottom>
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <StackPane>
+               <children>
+                  <ProgressBar fx:id="progressBar" prefHeight="50.0" prefWidth="337.0" progress="0.0" visible="false">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </VBox.margin>
+                     <StackPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </StackPane.margin>
+                  </ProgressBar>
+                  <Text fx:id="progressText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" />
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </bottom>
+   <top>
+      <VBox alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_RIGHT">
+               <children>
+                  <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="OSDC">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <HBox.margin>
+                        <Insets left="5.0" top="5.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <Button fx:id="minBtn" minHeight="20.0" minWidth="45.0" mnemonicParsing="false" onAction="#minimizeProgram">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="maxBtn" minHeight="20.0" minWidth="45.0" mnemonicParsing="false">
+                     <HBox.margin>
+                        <Insets right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="closeBtn" minHeight="20.0" minWidth="45.0" mnemonicParsing="false" onAction="#closeProgram">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <MenuBar BorderPane.alignment="CENTER">
+              <menus>
+                <Menu mnemonicParsing="false" text="Credits">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#credits" text="Freyr" />
+                        <MenuItem mnemonicParsing="false" onAction="#credits" text="Poesy700" />
+                        <MenuItem mnemonicParsing="false" onAction="#credits" text="Kyle_Friz" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+         </children>
+      </VBox>
+   </top>
+</BorderPane>
