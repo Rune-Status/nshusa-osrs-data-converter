@@ -135,7 +135,7 @@
                <children>
                   <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                      <children>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="OSDC">
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="OSDC [build 1.0.3]">
                            <font>
                               <Font size="14.0" />
                            </font>
