@@ -54,6 +54,8 @@ import net.openrs.cache.track.Tracks;
 import net.openrs.cache.type.CacheIndex;
 import net.openrs.cache.type.TypeListManager;
 import net.openrs.cache.type.areas.AreaType;
+import net.openrs.cache.type.identkits.IdentkitType;
+import net.openrs.cache.type.identkits.IdentkitTypeList;
 import net.openrs.cache.type.items.ItemTypeList;
 import net.openrs.cache.type.npcs.NpcType;
 import net.openrs.cache.type.npcs.NpcTypeList;
@@ -88,6 +90,125 @@ public final class Controller implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
+	}
+	
+	@FXML
+	private void dumpIdk() {
+		if (!cacheDirectory.isPresent()) {
+			DirectoryChooser cacheChooser = new DirectoryChooser();
+			cacheChooser.setTitle("Select osrs cache.");
+
+			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
+
+			if (!cacheResult.isPresent()) {
+				return;
+			}
+
+			cacheDirectory = cacheResult;
+		}
+		
+		createTask(new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				
+				@Cleanup
+				Cache cache = new Cache(FileStore.open(cacheDirectory.get().toPath().toString()));
+				
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				
+				@Cleanup
+				DataOutputStream dos = new DataOutputStream(bos);
+					
+					IdentkitTypeList list = new IdentkitTypeList();
+					
+					list.initialize(cache);
+					
+					dos.writeShort(list.size());					
+					
+					for (int i = 0; i < list.size(); i++ ) {
+						
+						IdentkitType type = list.list(i);
+						
+						if (type.getBodyPartId() != -1) {
+							dos.write(1);
+							dos.writeByte(type.getBodyPartId());
+						}
+						
+						if (type.getBodyModels() != null) {
+							dos.write(2);
+							dos.write(type.getBodyModels().length);
+							
+							for(int value : type.getBodyModels()) {
+								dos.writeShort(value);
+							}
+						}
+						
+						if (type.isNonSelectable()) {
+							dos.write(3);
+						}
+						
+						if (type.getRecolorToFind() != null) {
+							
+							for (int index = 0; index < type.getRecolorToFind().length; index++) {
+								short value = type.getRecolorToFind()[index];
+								
+								dos.write(40 + index);
+								dos.writeShort(value);
+							}							
+							
+						}
+						
+						if (type.getRecolorToReplace() != null) {
+							
+							for (int index = 0; index < type.getRecolorToReplace().length; index++) {
+								short value = type.getRecolorToReplace()[index];
+								
+								dos.write(50 + index);
+								dos.writeShort(value);
+							}							
+							
+						}
+						
+						if (type.getHeadModels() != null) {
+							
+							for (int index = 0; index < type.getHeadModels().length; index++) {
+								
+								int headModelId = type.getHeadModels()[index];
+								
+								dos.write(60 + index);
+								dos.writeShort(headModelId);
+							}
+							
+						}
+						
+						dos.write(0);
+						
+						
+					}
+					
+					File dir = new File("./dump/");
+					
+					if (!dir.exists()) {
+						dir.mkdirs();
+					}
+					
+					@Cleanup
+					FileOutputStream fos = new FileOutputStream(new File(dir, "idk.dat"));					
+					fos.write(bos.toByteArray());
+					
+					System.out.println(String.format("Dumped %s idk definitions into 317 format.", list.size()));
+
+					Platform.runLater(() -> {
+						Dialogue.openDirectory("Would you like to view these files?", dir);
+					});
+
+				return null;
+			}
+			
+		});
+		
+		
 	}
 
 	@FXML
