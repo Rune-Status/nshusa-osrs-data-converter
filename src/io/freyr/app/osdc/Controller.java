@@ -54,10 +54,8 @@ import net.openrs.cache.track.Tracks;
 import net.openrs.cache.type.CacheIndex;
 import net.openrs.cache.type.TypeListManager;
 import net.openrs.cache.type.areas.AreaType;
-import net.openrs.cache.type.identkits.IdentkitType;
 import net.openrs.cache.type.identkits.IdentkitTypeList;
 import net.openrs.cache.type.items.ItemTypeList;
-import net.openrs.cache.type.npcs.NpcType;
 import net.openrs.cache.type.npcs.NpcTypeList;
 import net.openrs.cache.type.objects.ObjectType;
 import net.openrs.cache.type.objects.ObjectTypeList;
@@ -93,10 +91,35 @@ public final class Controller implements Initializable {
 	}
 	
 	@FXML
+	void dumpAll() {
+		
+		if (!cacheDirectory.isPresent()) {
+			DirectoryChooser cacheChooser = new DirectoryChooser();
+			cacheChooser.setTitle("Select directory containing osrs cache.");
+
+			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
+
+			if (!cacheResult.isPresent()) {
+				return;
+			}
+
+			cacheDirectory = cacheResult;
+		}
+		
+		this.dumpItemDefs();
+		this.dumpNpcDefs();
+		this.dumpObjectDefs();
+		this.dumpAnimationDefs();
+		this.dumpGraphicDefs();
+		this.dumpVarbitDefs();
+		this.dumpFloorDefs();	
+	}
+	
+	@FXML
 	private void dumpIdk() {
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -120,7 +143,7 @@ public final class Controller implements Initializable {
 				@Cleanup
 				DataOutputStream dos = new DataOutputStream(bos);
 					
-					IdentkitTypeList list = new IdentkitTypeList();
+					val list = new IdentkitTypeList();
 					
 					list.initialize(cache);
 					
@@ -128,7 +151,7 @@ public final class Controller implements Initializable {
 					
 					for (int i = 0; i < list.size(); i++ ) {
 						
-						IdentkitType type = list.list(i);
+						val type = list.list(i);
 						
 						if (type.getBodyPartId() != -1) {
 							dos.write(1);
@@ -176,13 +199,22 @@ public final class Controller implements Initializable {
 								
 								int headModelId = type.getHeadModels()[index];
 								
+								if (headModelId == -1) {
+									continue;
+								}
+								
 								dos.write(60 + index);
 								dos.writeShort(headModelId);
 							}
 							
 						}
 						
-						dos.write(0);						
+						dos.write(0);	
+
+						double progress = ((double) (i + 1) / list.size()) * 100;
+
+						updateMessage(String.format("%.2f%s", progress, "%"));
+						updateProgress((i + 1), list.size());						
 						
 					}
 					
@@ -199,7 +231,7 @@ public final class Controller implements Initializable {
 					System.out.println(String.format("Dumped %s idk definitions into 317 format.", list.size()));
 
 					Platform.runLater(() -> {
-						Dialogue.openDirectory("Would you like to view these files?", dir);
+						Dialogue.openDirectory("Would you like to view this file?", dir);
 					});
 
 				return null;
@@ -215,7 +247,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -476,7 +508,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -493,13 +525,13 @@ public final class Controller implements Initializable {
 			protected Void call() throws Exception {
 				try (Cache cache = new Cache(FileStore.open(cacheDirectory.get().toPath().toString()))) {
 
-					File dir = new File("./dump/");
+					val dir = new File("./dump/");
 
 					if (!dir.exists()) {
 						dir.mkdirs();
 					}
 
-					NpcTypeList list = new NpcTypeList();
+					val list = new NpcTypeList();
 
 					list.initialize(cache);
 
@@ -507,14 +539,14 @@ public final class Controller implements Initializable {
 							DataOutputStream idx = new DataOutputStream(
 									new FileOutputStream(new File(dir, "npc.idx")))) {
 
-						int size = list.size();
+						val size = list.size();
 
 						idx.writeShort(size);
 						dat.writeShort(size);
 
 						for (int index = 0; index < list.size(); index++) {
 
-							NpcType npc = list.list(index);
+							val npc = list.list(index);
 
 							val start = dat.size();
 
@@ -680,7 +712,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -956,7 +988,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1089,7 +1121,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1212,7 +1244,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1281,7 +1313,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1387,7 +1419,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1451,7 +1483,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1491,9 +1523,6 @@ public final class Controller implements Initializable {
 						Archive skeletonArchive = Archive.decode(
 								cache.read(CacheIndex.SKELETONS, mainSkeletonId).getData(),
 								skeletonTable.getEntry(mainSkeletonId).size());
-
-						// System.out.println(skeletonId + " has " +
-						// archive.size() + " sub skeletons.");
 
 						int subSkeletonCount = skeletonArchive.size();
 
@@ -1576,7 +1605,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1640,7 +1669,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1970,9 +1999,7 @@ public final class Controller implements Initializable {
 
 					if (highestY == null || region.getBaseY() > highestY.getBaseY()) {
 						highestY = region;
-					}
-					
-					
+					}								
 					
 					updateMessage(String.format("%.2f%s", progress, "%"));
 					updateProgress((i + 1), MAX_REGION);					
