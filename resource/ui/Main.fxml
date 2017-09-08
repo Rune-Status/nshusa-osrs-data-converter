@@ -8,14 +8,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.battlerune.app.osdc.Controller">
+<BorderPane onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.freyr.app.osdc.Controller">
    <center>
-      <VBox>
-         <BorderPane.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </BorderPane.margin>
-         <children>
-            <TitledPane text="Configs">
+      <TabPane>
+         <tabs>
+            <Tab closable="false" text="Configs">
                <content>
                   <VBox alignment="CENTER" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed">
                      <children>
@@ -54,11 +51,16 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" />
                            </VBox.margin>
                         </Button>
+                        <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpIdk" text="Identity Kit (idk)">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Button>
                      </children>
                   </VBox>
                </content>
-            </TitledPane>
-            <TitledPane text="Indices">
+            </Tab>
+            <Tab closable="false" text="Indices">
                <content>
                   <VBox alignment="CENTER" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed">
                      <children>
@@ -79,21 +81,22 @@
                         </Button>
                         <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpMaps" text="Maps (Index 4)">
                            <VBox.margin>
-                              <Insets left="5.0" right="5.0" />
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
                            </VBox.margin>
                         </Button>
                      </children>
                   </VBox>
                </content>
-            </TitledPane>
-            <TitledPane text="Other">
+            </Tab>
+            <Tab closable="false" text="Other">
                <content>
                   <VBox alignment="CENTER" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed">
                      <children>
                         <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpSprites" text="Sprites">
                            <VBox.margin>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </VBox.margin></Button>
+                           </VBox.margin>
+                        </Button>
                         <Button minWidth="200.0" mnemonicParsing="false" onAction="#dumpMapImage" text="Map Image">
                            <VBox.margin>
                               <Insets bottom="5.0" left="5.0" right="5.0" />
@@ -102,9 +105,9 @@
                      </children>
                   </VBox>
                </content>
-            </TitledPane>
-         </children>
-      </VBox>
+            </Tab>
+         </tabs>
+      </TabPane>
    </center>
    <bottom>
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
@@ -132,7 +135,7 @@
                <children>
                   <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                      <children>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="OSDC">
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="OSDC [build 1.0.3]">
                            <font>
                               <Font size="14.0" />
                            </font>

@@ -54,8 +54,8 @@ import net.openrs.cache.track.Tracks;
 import net.openrs.cache.type.CacheIndex;
 import net.openrs.cache.type.TypeListManager;
 import net.openrs.cache.type.areas.AreaType;
+import net.openrs.cache.type.identkits.IdentkitTypeList;
 import net.openrs.cache.type.items.ItemTypeList;
-import net.openrs.cache.type.npcs.NpcType;
 import net.openrs.cache.type.npcs.NpcTypeList;
 import net.openrs.cache.type.objects.ObjectType;
 import net.openrs.cache.type.objects.ObjectTypeList;
@@ -89,13 +89,165 @@ public final class Controller implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 	}
+	
+	@FXML
+	void dumpAll() {
+		
+		if (!cacheDirectory.isPresent()) {
+			DirectoryChooser cacheChooser = new DirectoryChooser();
+			cacheChooser.setTitle("Select directory containing osrs cache.");
+
+			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
+
+			if (!cacheResult.isPresent()) {
+				return;
+			}
+
+			cacheDirectory = cacheResult;
+		}
+		
+		this.dumpItemDefs();
+		this.dumpNpcDefs();
+		this.dumpObjectDefs();
+		this.dumpAnimationDefs();
+		this.dumpGraphicDefs();
+		this.dumpVarbitDefs();
+		this.dumpFloorDefs();	
+	}
+	
+	@FXML
+	private void dumpIdk() {
+		if (!cacheDirectory.isPresent()) {
+			DirectoryChooser cacheChooser = new DirectoryChooser();
+			cacheChooser.setTitle("Select directory containing osrs cache.");
+
+			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
+
+			if (!cacheResult.isPresent()) {
+				return;
+			}
+
+			cacheDirectory = cacheResult;
+		}
+		
+		createTask(new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				
+				@Cleanup
+				Cache cache = new Cache(FileStore.open(cacheDirectory.get().toPath().toString()));
+				
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				
+				@Cleanup
+				DataOutputStream dos = new DataOutputStream(bos);
+					
+					val list = new IdentkitTypeList();
+					
+					list.initialize(cache);
+					
+					dos.writeShort(list.size());					
+					
+					for (int i = 0; i < list.size(); i++ ) {
+						
+						val type = list.list(i);
+						
+						if (type.getBodyPartId() != -1) {
+							dos.write(1);
+							dos.writeByte(type.getBodyPartId());
+						}
+						
+						if (type.getBodyModels() != null) {
+							dos.write(2);
+							dos.write(type.getBodyModels().length);
+							
+							for(int value : type.getBodyModels()) {
+								dos.writeShort(value);
+							}
+						}
+						
+						if (type.isNonSelectable()) {
+							dos.write(3);
+						}
+						
+						if (type.getRecolorToFind() != null) {
+							
+							for (int index = 0; index < type.getRecolorToFind().length; index++) {
+								short value = type.getRecolorToFind()[index];
+								
+								dos.write(40 + index);
+								dos.writeShort(value);
+							}							
+							
+						}
+						
+						if (type.getRecolorToReplace() != null) {
+							
+							for (int index = 0; index < type.getRecolorToReplace().length; index++) {
+								short value = type.getRecolorToReplace()[index];
+								
+								dos.write(50 + index);
+								dos.writeShort(value);
+							}							
+							
+						}
+						
+						if (type.getHeadModels() != null) {
+							
+							for (int index = 0; index < type.getHeadModels().length; index++) {
+								
+								int headModelId = type.getHeadModels()[index];
+								
+								if (headModelId == -1) {
+									continue;
+								}
+								
+								dos.write(60 + index);
+								dos.writeShort(headModelId);
+							}
+							
+						}
+						
+						dos.write(0);	
+
+						double progress = ((double) (i + 1) / list.size()) * 100;
+
+						updateMessage(String.format("%.2f%s", progress, "%"));
+						updateProgress((i + 1), list.size());						
+						
+					}
+					
+					File dir = new File("./dump/");
+					
+					if (!dir.exists()) {
+						dir.mkdirs();
+					}
+					
+					@Cleanup
+					FileOutputStream fos = new FileOutputStream(new File(dir, "idk.dat"));					
+					fos.write(bos.toByteArray());
+					
+					System.out.println(String.format("Dumped %s idk definitions into 317 format.", list.size()));
+
+					Platform.runLater(() -> {
+						Dialogue.openDirectory("Would you like to view this file?", dir);
+					});
+
+				return null;
+			}
+			
+		});
+		
+		
+	}
 
 	@FXML
 	private void dumpItemDefs() {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -356,7 +508,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -373,13 +525,13 @@ public final class Controller implements Initializable {
 			protected Void call() throws Exception {
 				try (Cache cache = new Cache(FileStore.open(cacheDirectory.get().toPath().toString()))) {
 
-					File dir = new File("./dump/");
+					val dir = new File("./dump/");
 
 					if (!dir.exists()) {
 						dir.mkdirs();
 					}
 
-					NpcTypeList list = new NpcTypeList();
+					val list = new NpcTypeList();
 
 					list.initialize(cache);
 
@@ -387,14 +539,14 @@ public final class Controller implements Initializable {
 							DataOutputStream idx = new DataOutputStream(
 									new FileOutputStream(new File(dir, "npc.idx")))) {
 
-						int size = list.size();
+						val size = list.size();
 
 						idx.writeShort(size);
 						dat.writeShort(size);
 
 						for (int index = 0; index < list.size(); index++) {
 
-							NpcType npc = list.list(index);
+							val npc = list.list(index);
 
 							val start = dat.size();
 
@@ -560,7 +712,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -836,7 +988,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -969,7 +1121,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1092,7 +1244,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1161,7 +1313,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1267,7 +1419,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1331,7 +1483,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1371,9 +1523,6 @@ public final class Controller implements Initializable {
 						Archive skeletonArchive = Archive.decode(
 								cache.read(CacheIndex.SKELETONS, mainSkeletonId).getData(),
 								skeletonTable.getEntry(mainSkeletonId).size());
-
-						// System.out.println(skeletonId + " has " +
-						// archive.size() + " sub skeletons.");
 
 						int subSkeletonCount = skeletonArchive.size();
 
@@ -1456,7 +1605,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1520,7 +1669,7 @@ public final class Controller implements Initializable {
 
 		if (!cacheDirectory.isPresent()) {
 			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select osrs cache.");
+			cacheChooser.setTitle("Select directory containing osrs cache.");
 
 			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
 
@@ -1850,9 +1999,7 @@ public final class Controller implements Initializable {
 
 					if (highestY == null || region.getBaseY() > highestY.getBaseY()) {
 						highestY = region;
-					}
-					
-					
+					}								
 					
 					updateMessage(String.format("%.2f%s", progress, "%"));
 					updateProgress((i + 1), MAX_REGION);					
