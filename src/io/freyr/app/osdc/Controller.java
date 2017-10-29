@@ -388,8 +388,8 @@ public final class Controller implements Initializable {
 							dat.writeByte(item.getColorFind().length);
 
 							for (int i = 0; i < item.getColorFind().length; i++) {
-								dat.writeShort(item.getColorReplace()[i]);
 								dat.writeShort(item.getColorFind()[i]);
+								dat.writeShort(item.getColorReplace()[i]);
 							}
 						}
 
