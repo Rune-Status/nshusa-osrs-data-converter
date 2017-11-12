@@ -89,32 +89,7 @@ public final class Controller implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 	}
-	
-	@FXML
-	void dumpAll() {
-		
-		if (!cacheDirectory.isPresent()) {
-			DirectoryChooser cacheChooser = new DirectoryChooser();
-			cacheChooser.setTitle("Select directory containing osrs cache.");
 
-			Optional<File> cacheResult = Optional.ofNullable(cacheChooser.showDialog(App.getStage()));
-
-			if (!cacheResult.isPresent()) {
-				return;
-			}
-
-			cacheDirectory = cacheResult;
-		}
-		
-		this.dumpItemDefs();
-		this.dumpNpcDefs();
-		this.dumpObjectDefs();
-		this.dumpAnimationDefs();
-		this.dumpGraphicDefs();
-		this.dumpVarbitDefs();
-		this.dumpFloorDefs();	
-	}
-	
 	@FXML
 	private void dumpIdk() {
 		if (!cacheDirectory.isPresent()) {
@@ -388,8 +363,8 @@ public final class Controller implements Initializable {
 							dat.writeByte(item.getColorFind().length);
 
 							for (int i = 0; i < item.getColorFind().length; i++) {
-								dat.writeShort(item.getColorReplace()[i]);
 								dat.writeShort(item.getColorFind()[i]);
+								dat.writeShort(item.getColorReplace()[i]);
 							}
 						}
 
